@@ -125,6 +125,9 @@ function init() {
   loader.load(
     '/hand.fbx',
     function (object) {
+      setTimeout(() => {
+        document.body.removeChild(loading);
+      }, 1000);
       object.rotateY(30);
       model = object;
       scene.add(object);
@@ -145,11 +148,6 @@ function init() {
     },
     function (e) {
       loading.innerText = `${e.loaded}/${e.total}`;
-      if (e.loaded >= e.total) {
-        setTimeout(() => {
-          document.body.removeChild(loading);
-        }, 1000);
-      }
     }
   );
 
