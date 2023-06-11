@@ -145,7 +145,7 @@ function init() {
     },
     function (e) {
       loading.innerText = `${e.loaded}/${e.total}`;
-      if (e.loaded === e.total) {
+      if (e.loaded >= e.total) {
         setTimeout(() => {
           document.body.removeChild(loading);
         }, 1000);
