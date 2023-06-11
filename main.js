@@ -2,6 +2,12 @@ import './style.css';
 import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+let loading = document.createElement('div');
+loading.style.position = 'absolute';
+loading.style.top = '5px';
+loading.style.left = '5px';
+loading.style.color = '#fff';
+document.body.appendChild(loading);
 let selectionShape,
   controls,
   camera,
@@ -116,25 +122,36 @@ function init() {
 
   // 导入FBX模型
   const loader = new FBXLoader();
-  loader.load('/hand.fbx', function (object) {
-    object.rotateY(30);
-    model = object;
-    scene.add(object);
+  loader.load(
+    '/hand.fbx',
+    function (object) {
+      object.rotateY(30);
+      model = object;
+      scene.add(object);
 
-    object.children.forEach((item, index) => {
-      if (
-        ['M_HT', 'M_LI', 'M_LU', 'M_PC', 'M_SI', 'M_SJ'].findIndex((nameAdj) =>
-          item.name.includes(nameAdj)
-        ) > -1
-      ) {
-        item.userData._id = index;
-        acupoints.push(item);
+      object.children.forEach((item, index) => {
+        if (
+          ['M_HT', 'M_LI', 'M_LU', 'M_PC', 'M_SI', 'M_SJ'].findIndex(
+            (nameAdj) => item.name.includes(nameAdj)
+          ) > -1
+        ) {
+          item.userData._id = index;
+          acupoints.push(item);
+        }
+      });
+      let pickingSceneObject = object.clone();
+      deepSetModel(pickingSceneObject);
+      pickingScene.add(pickingSceneObject);
+    },
+    function (e) {
+      loading.innerText = `${e.loaded}/${e.total}`;
+      if (e.loaded === e.total) {
+        setTimeout(() => {
+          document.body.removeChild(loading);
+        }, 1000);
       }
-    });
-    let pickingSceneObject = object.clone();
-    deepSetModel(pickingSceneObject);
-    pickingScene.add(pickingSceneObject);
-  });
+    }
+  );
 
   // 创建渲染器
   const bgColor = new THREE.Color(0x263238);
